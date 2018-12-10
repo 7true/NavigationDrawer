@@ -1,23 +1,31 @@
 package tk.alltrue.navigationdrawer;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private TextView mSlideshowTextView;
+    private TextView mGalleryTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,13 +43,47 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        final ConstraintLayout content = findViewById(R.id.container);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string
+                .navigation_drawer_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+
+                float slideX = drawerView.getWidth() * slideOffset;
+                content.setTranslationX(slideX);
+
+                content.setScaleX(1 - slideOffset);
+                content.setScaleY(1 - slideOffset);
+            }
+        };
+
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        //drawer.setScrimColor(Color.TRANSPARENT);
+        //drawer.setDrawerElevation(0f);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mGalleryTextView = (TextView) navigationView.getMenu().findItem(R.id.nav_gallery).getActionView();
+        mSlideshowTextView = (TextView) navigationView.getMenu().findItem(R.id.nav_slideshow).getActionView();
+        initializeCounterDrawer();
+    }
+    private void initializeCounterDrawer() {
+        mGalleryTextView.setGravity(Gravity.CENTER_VERTICAL);
+        mGalleryTextView.setTypeface(null, Typeface.BOLD);
+        mGalleryTextView.setTextColor(getResources().getColor(R.color.colorAccent));
+        mGalleryTextView.setText("99+");
+        mSlideshowTextView.setGravity(Gravity.CENTER_VERTICAL);
+        mSlideshowTextView.setTypeface(null, Typeface.BOLD);
+        mSlideshowTextView.setTextColor(getResources().getColor(R.color.colorAccent));
+        mSlideshowTextView.setText("7");
     }
 
     @Override
@@ -105,11 +147,11 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+/*
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
         item.setChecked(true);
-        setTitle(item.getTitle());
+        setTitle(item.getTitle());*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
